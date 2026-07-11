@@ -285,6 +285,60 @@
     font-size: 0.8rem;
     margin-top: 28px;
   }
+
+  .qr-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    color: var(--teal);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(53, 198, 192, 0.5);
+    padding-bottom: 2px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .qr-link:hover { border-bottom-color: var(--teal); }
+
+  /* ---------- QR modal ---------- */
+  .qr-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 20, 0.92);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    z-index: 55;
+    padding: 24px;
+    cursor: zoom-out;
+  }
+  .qr-modal.open { display: flex; }
+  .qr-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 18px 18px 14px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .qr-card img {
+    display: block;
+    width: min(72vw, 300px);
+    height: auto;
+  }
+  .qr-card p {
+    color: #33415c;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 6px;
+  }
+  .qr-modal .close-hint {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
 </style>
 </head>
 <body>
@@ -331,8 +385,22 @@
     <p class="img-caption">Tap the image to zoom</p>
   </section>
 
-  <footer>Trades welcome — add me and let's swap some shinies! 🦩</footer>
+  <footer>
+    Trades welcome — add me and let's swap some shinies! 🦩
+    <a href="#" class="qr-link" id="qr-link">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM21 14v.01M14 21v.01M17 21h4"/></svg>
+      Show QR code for this page
+    </a>
+  </footer>
 
+</div>
+
+<div class="qr-modal" id="qr-modal" role="dialog" aria-label="QR code linking to this page">
+  <div class="qr-card">
+    <img src="qr.svg" alt="QR code that opens this trade list website">
+    <p>Scan with a phone camera to<br>open this trade list</p>
+  </div>
+  <p class="close-hint">Tap anywhere to close ✕</p>
 </div>
 
 <div class="lightbox" id="lightbox" role="dialog" aria-label="Trade list, zoomed">
@@ -405,8 +473,21 @@
     lightbox.classList.remove('open');
     document.body.style.overflow = '';
   });
+  const qrModal = document.getElementById('qr-modal');
+  document.getElementById('qr-link').addEventListener('click', e => {
+    e.preventDefault();
+    qrModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+  qrModal.addEventListener('click', () => {
+    qrModal.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && lightbox.classList.contains('open')) lightbox.click();
+    if (e.key !== 'Escape') return;
+    if (lightbox.classList.contains('open')) lightbox.click();
+    if (qrModal.classList.contains('open')) qrModal.click();
   });
 </script>
 
