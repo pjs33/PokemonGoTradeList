@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — FertileFlamingo Trade List</title>
+<link rel="icon" href="icon-192.png" type="image/png">
+<style>
+  :root {
+    --bg: #0e1420;
+    --card: #1c2738;
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text: #eef3fa;
+    --text-dim: #9db0c7;
+    --teal: #35c6c0;
+    --teal-deep: #1e9e99;
+    --pink: #f26d9c;
+    --green: #7ee081;
+    --red: #ff7a7a;
+    --radius: 18px;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: radial-gradient(900px 500px at 80% -10%, rgba(53, 198, 192, 0.15), transparent 60%), var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 28px 16px 64px; }
+
+  h1 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  h1 span { color: var(--pink); }
+  .sub {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+  }
+  .sub a { color: var(--teal); }
+
+  .card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 40%), var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card h2 {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+
+  label { display: block; color: var(--text-dim); font-size: 0.85rem; margin-bottom: 8px; }
+
+  textarea, input[type="password"] {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.9rem;
+    padding: 12px;
+    outline: none;
+  }
+  textarea:focus, input:focus { border-color: var(--teal); }
+  textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
+
+  .status { font-size: 0.85rem; margin-top: 10px; line-height: 1.5; min-height: 1.3em; }
+  .status.ok { color: var(--green); }
+  .status.err { color: var(--red); }
+  .status.dim { color: var(--text-dim); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 20px;
+    margin-top: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: #06211f;
+    background: linear-gradient(135deg, var(--teal), var(--teal-deep));
+    cursor: pointer;
+    transition: transform 0.12s ease, filter 0.12s ease;
+    box-shadow: 0 4px 14px rgba(53, 198, 192, 0.35);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: default; filter: none; transform: none; }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--card-border);
+    color: var(--text-dim);
+    box-shadow: none;
+    width: auto;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 12px;
+  }
+  .preview img { width: 44px; height: 44px; }
+
+  details { margin-top: 4px; }
+  summary { color: var(--teal); font-size: 0.85rem; cursor: pointer; }
+  details ol { margin: 10px 0 0 20px; color: var(--text-dim); font-size: 0.85rem; line-height: 1.7; }
+  details a { color: var(--teal); }
+  details code { font-family: ui-monospace, Menlo, monospace; color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <h1>Trade List <span>Admin</span></h1>
+  <p class="sub">Edits the live site at <a href="./">pjs33.github.io/PokemonGoTradeList</a></p>
+
+  <section class="card">
+    <h2>Search String</h2>
+    <label for="search-input">Dex numbers, comma-separated, then filters (e.g. <code>&amp;shiny&amp;!traded</code>)</label>
+    <textarea id="search-input" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    <p class="status dim" id="parse-status"></p>
+    <div class="preview" id="preview"></div>
+    <button class="btn" id="save-btn" disabled>Save &amp; Publish</button>
+    <p class="status" id="save-status"></p>
+  </section>
+
+  <section class="card">
+    <h2>GitHub Token</h2>
+    <label for="token-input">Fine-grained personal access token (stored only on this device)</label>
+    <input type="password" id="token-input" placeholder="github_pat_…">
+    <p class="status" id="token-status"></p>
+    <button class="btn btn-ghost" id="forget-btn" style="margin-top: 10px;">Forget token on this device</button>
+    <details>
+      <summary>How to create the token (one time)</summary>
+      <ol>
+        <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (logged in as pjs33)</li>
+        <li>Name it e.g. <code>trade-list-admin</code>, set a long expiration</li>
+        <li>Repository access → <strong>Only select repositories</strong> → <code>PokemonGoTradeList</code></li>
+        <li>Permissions → Repository permissions → <strong>Contents: Read and write</strong></li>
+        <li>Generate, copy the <code>github_pat_…</code> value, paste it above</li>
+      </ol>
+    </details>
+  </section>
+
+</div>
+
+<script>
+  const OWNER = 'pjs33';
+  const REPO = 'PokemonGoTradeList';
+  const API = 'https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/config.json';
+  const LIVE_CONFIG = 'https://' + OWNER + '.github.io/' + REPO + '/config.json';
+
+  const searchInput = document.getElementById('search-input');
+  const parseStatus = document.getElementById('parse-status');
+  const previewEl = document.getElementById('preview');
+  const saveBtn = document.getElementById('save-btn');
+  const saveStatus = document.getElementById('save-status');
+  const tokenInput = document.getElementById('token-input');
+  const tokenStatus = document.getElementById('token-status');
+
+  let fileSha = null;
+
+  function setStatus(el, msg, cls) {
+    el.textContent = msg;
+    el.className = 'status' + (cls ? ' ' + cls : '');
+  }
+
+  function getToken() { return localStorage.getItem('gh_token') || ''; }
+
+  tokenInput.value = getToken();
+  if (getToken()) setStatus(tokenStatus, 'Token saved on this device.', 'ok');
+
+  tokenInput.addEventListener('change', () => {
+    const t = tokenInput.value.trim();
+    if (t) {
+      localStorage.setItem('gh_token', t);
+      setStatus(tokenStatus, 'Token saved on this device.', 'ok');
+    }
+    validate();
+  });
+
+  document.getElementById('forget-btn').addEventListener('click', () => {
+    localStorage.removeItem('gh_token');
+    tokenInput.value = '';
+    setStatus(tokenStatus, 'Token removed.', 'dim');
+    validate();
+  });
+
+  // --- parse + live preview ---
+  function parseIds(str) {
+    const numbersPart = str.trim().split('&')[0];
+    if (!numbersPart) return null;
+    const ids = numbersPart.split(',').map(s => s.trim());
+    if (ids.some(s => !/^\d+$/.test(s))) return null;
+    return ids.map(Number);
+  }
+
+  function validate() {
+    const str = searchInput.value.trim();
+    const ids = parseIds(str);
+    previewEl.innerHTML = '';
+    if (!ids) {
+      setStatus(parseStatus, str ? 'Numbers part looks malformed — expected comma-separated dex numbers before the first "&".' : '', 'err');
+      saveBtn.disabled = true;
+      return;
+    }
+    setStatus(parseStatus, ids.length + ' Pokémon parsed' + (str.includes('&') ? ' · filters: ' + str.slice(str.indexOf('&')) : ''), 'dim');
+    ids.forEach(id => {
+      const img = document.createElement('img');
+      img.src = 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/shiny/' + id + '.png';
+      img.alt = '#' + id;
+      img.onerror = () => { img.style.opacity = 0.2; };
+      previewEl.append(img);
+    });
+    saveBtn.disabled = !str || !getToken();
+    setStatus(saveStatus, getToken() ? '' : 'Add your GitHub token below to enable saving.', 'dim');
+  }
+  searchInput.addEventListener('input', validate);
+
+  // --- load current value ---
+  async function loadCurrent() {
+    setStatus(saveStatus, 'Loading current search string…', 'dim');
+    try {
+      const res = await fetch(API, { cache: 'no-store' });
+      if (!res.ok) throw new Error('api ' + res.status);
+      const data = await res.json();
+      fileSha = data.sha;
+      searchInput.value = JSON.parse(atob(data.content.replace(/\n/g, ''))).searchString;
+    } catch (e) {
+      // repo file not reachable (first deploy, rate limit…) — fall back to the served copy
+      try {
+        const res = await fetch('config.json', { cache: 'no-cache' });
+        searchInput.value = (await res.json()).searchString;
+      } catch (e2) {
+        setStatus(saveStatus, 'Could not load the current config: ' + e.message, 'err');
+        return;
+      }
+    }
+    setStatus(saveStatus, '', 'dim');
+    validate();
+  }
+
+  // --- save ---
+  saveBtn.addEventListener('click', async () => {
+    const token = getToken();
+    const newString = searchInput.value.trim();
+    saveBtn.disabled = true;
+    setStatus(saveStatus, 'Saving to GitHub…', 'dim');
+    try {
+      // refresh sha to avoid conflicts
+      const head = await fetch(API + '?t=' + Date.now(), {
+        headers: { Authorization: 'Bearer ' + token }, cache: 'no-store'
+      });
+      if (head.ok) fileSha = (await head.json()).sha;
+
+      const body = {
+        message: 'Update search string via admin page',
+        content: btoa(JSON.stringify({ searchString: newString }, null, 2) + '\n')
+      };
+      if (fileSha) body.sha = fileSha;
+
+      const res = await fetch(API, {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          Accept: 'application/vnd.github+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+      if (res.status === 401 || res.status === 403) throw new Error('GitHub rejected the token — check it has Contents read/write on this repo.');
+      if (!res.ok) throw new Error('GitHub API error ' + res.status);
+      fileSha = (await res.json()).content.sha;
+
+      setStatus(saveStatus, 'Saved ✓ — waiting for the site to deploy…', 'ok');
+      await waitForDeploy(newString);
+      setStatus(saveStatus, 'Saved ✓ — live on the site now!', 'ok');
+    } catch (e) {
+      setStatus(saveStatus, e.message, 'err');
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  async function waitForDeploy(expected) {
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 6000));
+      try {
+        const res = await fetch(LIVE_CONFIG + '?t=' + Date.now(), { cache: 'no-store' });
+        if ((await res.json()).searchString === expected) return;
+      } catch (e) { /* keep polling */ }
+    }
+    throw new Error('Saved to GitHub, but the site is taking a while to deploy — it should appear within a few minutes.');
+  }
+
+  loadCurrent();
+</script>
+
+</body>
+</html>

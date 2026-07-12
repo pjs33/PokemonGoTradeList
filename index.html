@@ -368,7 +368,7 @@
       Trade Search String
     </h2>
     <p class="hint" style="margin-bottom: 14px;">Copy this and paste it into your Pokémon GO search bar to instantly find everything on my list that you have.</p>
-    <button class="copy-btn wide" data-copy="191,207,241,285,292,293,335,345,347,355,357,369,387,390,449,455,479,511,513,519,524,535,564,572,590,610,744,745,769,781,884,924,948,960,962,965&amp;shiny&amp;!traded" data-label="Search string">
+    <button class="copy-btn wide" data-copy="" data-label="Search string">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       <span class="btn-text">Copy Search String</span>
     </button>
@@ -446,6 +446,7 @@
 
   document.querySelectorAll('[data-copy]').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (!btn.dataset.copy) { showToast('Still loading — try again in a second'); return; }
       copyText(btn.dataset.copy).then(() => {
         showToast(btn.dataset.label + ' copied!');
         const label = btn.querySelector('.btn-text');
@@ -475,34 +476,52 @@
   };
 
   const dexGrid = document.getElementById('dex-grid');
-  document.querySelector('.copy-btn.wide').dataset.copy
-    .split('&')[0].split(',').map(Number).forEach(id => {
-      const cell = document.createElement('div');
-      cell.className = 'dex-cell';
 
-      const spark = document.createElement('span');
-      spark.className = 'dex-spark';
-      spark.textContent = '✨';
+  function lookupName(id, nameEl) {
+    fetch('https://pokeapi.co/api/v2/pokemon-species/' + id)
+      .then(r => r.json())
+      .then(data => {
+        nameEl.textContent = data.name
+          .split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      })
+      .catch(() => {}); // keep the "No. X" placeholder
+  }
 
-      const img = document.createElement('img');
-      img.alt = 'Shiny ' + (NAMES[id] || 'Pokémon #' + id);
-      img.src = 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/other/home/shiny/' + id + '.png';
-      img.onerror = () => {
-        img.onerror = null;
-        img.src = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/' + id + '.png';
-      };
+  fetch('config.json', { cache: 'no-cache' })
+    .then(r => r.json())
+    .then(config => {
+      document.querySelector('.copy-btn.wide').dataset.copy = config.searchString;
 
-      const name = document.createElement('div');
-      name.className = 'dex-name';
-      name.textContent = NAMES[id] || 'No. ' + id;
+      config.searchString.split('&')[0].split(',').map(Number).forEach(id => {
+        const cell = document.createElement('div');
+        cell.className = 'dex-cell';
 
-      const num = document.createElement('div');
-      num.className = 'dex-num';
-      num.textContent = '#' + String(id).padStart(3, '0');
+        const spark = document.createElement('span');
+        spark.className = 'dex-spark';
+        spark.textContent = '✨';
 
-      cell.append(spark, img, name, num);
-      dexGrid.append(cell);
-    });
+        const img = document.createElement('img');
+        img.alt = 'Shiny ' + (NAMES[id] || 'Pokémon #' + id);
+        img.src = 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/other/home/shiny/' + id + '.png';
+        img.onerror = () => {
+          img.onerror = null;
+          img.src = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/' + id + '.png';
+        };
+
+        const name = document.createElement('div');
+        name.className = 'dex-name';
+        name.textContent = NAMES[id] || 'No. ' + id;
+        if (!NAMES[id]) lookupName(id, name);
+
+        const num = document.createElement('div');
+        num.className = 'dex-num';
+        num.textContent = '#' + String(id).padStart(3, '0');
+
+        cell.append(spark, img, name, num);
+        dexGrid.append(cell);
+      });
+    })
+    .catch(() => showToast('Could not load the trade list — refresh to retry'));
 
   const SITE_URL = 'https://pjs33.github.io/PokemonGoTradeList/';
   document.getElementById('share-btn').addEventListener('click', () => {
